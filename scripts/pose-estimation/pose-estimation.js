@@ -1,8 +1,8 @@
 import {
-    PoseLandmarker,
-    FilesetResolver,
-    DrawingUtils
-  } from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.10.0";
+  PoseLandmarker,
+  FilesetResolver,
+  DrawingUtils
+} from "https://cdn.skypack.dev/@mediapipe/tasks-vision@0.10.0";
 
 export class PoseEstimation {
   constructor() {
