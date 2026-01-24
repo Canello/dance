@@ -1,24 +1,27 @@
-import { PoseEstimation } from './pose-estimation/main.js';
-import { VideoInput } from './video-input/main.js';
+import { VideoInput } from './video-input/video-input.js';
+import { PoseEstimation } from './pose-estimation/pose-estimation.js';
 
 class Orchestrator {
   constructor() {
     this.videoInput = new VideoInput();
-    window.videoInput = this.videoInput;
-
     this.poseEstimation = new PoseEstimation();
+    
+    // Debug access
+    window.videoInput = this.videoInput;
+    window.poseEstimation = this.poseEstimation;
   }
 
   async start() {
-    this.startVideoInput((frameData) => {
-      // This will be connected to pose estimation later
-      console.log('Frame received:', frameData.videoElement);
+    await this.poseEstimation.initialize();
+    this.poseEstimation.setOnPoseCallback((poseData) => {
+      // This will be connected to motion analysis later
+      // console.log('Pose detected:', poseData);
     });
-  }
 
-  async startVideoInput(onFrameCallback) {
     await this.videoInput.initialize();
-    this.videoInput.setOnFrameCallback(onFrameCallback);
+    this.videoInput.setOnFrameCallback((frameData) => {
+      this.poseEstimation.processFrame(frameData);
+    });
     this.videoInput.start();
   }
 }
