@@ -1,21 +1,28 @@
 import { VideoInput } from './video-input/video-input.js';
 import { PoseEstimation } from './pose-estimation/pose-estimation.js';
+import { MotionAnalysis } from './motion-analysis/motion-analysis.js';
 
 class Orchestrator {
   constructor() {
     this.videoInput = new VideoInput();
     this.poseEstimation = new PoseEstimation();
+    this.motionAnalysis = new MotionAnalysis();
     
     // Debug access
     window.videoInput = this.videoInput;
     window.poseEstimation = this.poseEstimation;
+    window.motionAnalysis = this.motionAnalysis;
   }
 
   async start() {
+    this.motionAnalysis.setOnMotionCallback((motionData) => {
+      // This will be connected to motion-to-music mapping later
+      console.log('Motion:', motionData.body.energy);
+    });
+    
     await this.poseEstimation.initialize();
     this.poseEstimation.setOnPoseCallback((poseData) => {
-      // This will be connected to motion analysis later
-      // console.log('Pose detected:', poseData);
+      this.motionAnalysis.processPose(poseData);
     });
 
     await this.videoInput.initialize();
