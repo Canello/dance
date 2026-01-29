@@ -1,7 +1,7 @@
-import { LeftWristStrategy } from './strategies/index.js';
+import { LeftWristStrategy, WristsHarmonicsStrategy } from './strategies/index.js';
 
 export class MotionToMusic {
-  constructor(strategy = new LeftWristStrategy()) {
+  constructor(strategy = new WristsHarmonicsStrategy()) {
     this.strategy = strategy;
 
     this.currentParams = [
@@ -20,10 +20,6 @@ export class MotionToMusic {
   }
 
   processMotion(motionData) {
-    if (!motionData) {
-      return null;
-    }
-
     const params = this.strategy.map(motionData, this.currentParams);
 
     if (!Array.isArray(params)) {

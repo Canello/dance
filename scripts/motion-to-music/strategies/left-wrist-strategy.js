@@ -4,7 +4,7 @@ export class LeftWristStrategy {
     // Typical range: -0.5m (high) to -2.0m (low) from camera
     this.frequencyRange = {
       min: 220,  // A3
-      max: 880   // A5
+      max: 1760 // 880   // A5
     };
 
     this.heightRange = {
