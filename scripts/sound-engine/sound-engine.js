@@ -55,10 +55,7 @@ export class SoundEngine {
       return;
     }
 
-    this.workletNode.port.postMessage({
-      frequency: params.frequency || 440,
-      amplitude: params.amplitude || 0
-    });
+    this.workletNode.port.postMessage(params);
   }
 
   async start() {
@@ -82,7 +79,8 @@ export class SoundEngine {
   async stop() {
     if (!this.isRunning) return;
 
-    this.updateParameters({ frequency: 440, amplitude: 0 });
+    // Silence all waves
+    this.updateParameters([{ frequency: 440, amplitude: 0, phase: 0 }]);
 
     if (this.audioContext && this.audioContext.state === 'running') {
       await this.audioContext.suspend();
@@ -93,7 +91,7 @@ export class SoundEngine {
   }
 
   dispose() {
-    this.updateParameters({ frequency: 440, amplitude: 0 });
+    this.updateParameters([{ frequency: 440, amplitude: 0, phase: 0 }]);
 
     if (this.workletNode) {
       this.workletNode.disconnect();

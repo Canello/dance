@@ -1,22 +1,44 @@
 class SineWaveProcessor extends AudioWorkletProcessor {
   constructor() {
     super();
-    
-    this.phase = 0;
-    this.currentFrequency = 440; // Hz
-    this.currentAmplitude = 0;
-    this.targetFrequency = 440;
-    this.targetAmplitude = 0;
+
+    this.waves = [
+      {
+        targetFrequency: 440, // Hz
+        targetAmplitude: 0,
+        currentFrequency: 440,
+        currentAmplitude: 0,
+        x: 0,
+        phase: 0
+      }
+    ];
     
     // Smoothing factor (0-1, higher = faster response)
     // 0.1 means 10% towards target per buffer (~2.9ms smoothing)
     this.smoothingFactor = 0.1;
     
-    this.port.onmessage = (event) => {
-      const { frequency, amplitude } = event.data;
-      this.targetFrequency = frequency;
-      this.targetAmplitude = amplitude;
-    };
+    this.port.onmessage = this.onMessage.bind(this);
+  }
+
+  onMessage(event) {
+    const params = event.data;
+
+    if (this.waves.length !== params.length) {
+      this.waves = new Array(params.length).fill(null).map(() => ({
+        targetFrequency: 440,
+        targetAmplitude: 0,
+        currentFrequency: 440,
+        currentAmplitude: 0,
+        x: 0,
+        phase: 0
+      }));
+    }
+
+    params.forEach((param, index) => {
+      this.waves[index].targetFrequency = param.frequency;
+      this.waves[index].targetAmplitude = param.amplitude;
+      this.waves[index].phase = param.phase; // Should be constant
+    });
   }
 
   process(inputs, outputs, parameters) {
@@ -27,20 +49,24 @@ class SineWaveProcessor extends AudioWorkletProcessor {
       return true;
     }
 
-    // Interpolate current parameters towards target (smoothing)
-    this.currentFrequency += (this.targetFrequency - this.currentFrequency) * this.smoothingFactor;
-    this.currentAmplitude += (this.targetAmplitude - this.currentAmplitude) * this.smoothingFactor;
+    for (let i = 0; i < this.waves.length; i++) {
+      const wave = this.waves[i];
 
-    // sampleRate is a global constant in AudioWorkletProcessor
-    const phaseIncrement = (2 * Math.PI * this.currentFrequency) / sampleRate;
+      // Interpolate current parameters towards target (smoothing)
+      wave.currentFrequency += (wave.targetFrequency - wave.currentFrequency) * this.smoothingFactor;
+      wave.currentAmplitude += (wave.targetAmplitude - wave.currentAmplitude) * this.smoothingFactor;
+      
+      // sampleRate is a global constant in AudioWorkletProcessor
+      const xIncrement = (2 * Math.PI * wave.currentFrequency) / sampleRate;
 
-    for (let i = 0; i < channel.length; i++) {
-      channel[i] = Math.sin(this.phase) * this.currentAmplitude;
-      
-      this.phase += phaseIncrement;
-      
-      if (this.phase >= 2 * Math.PI) {
-        this.phase -= 2 * Math.PI;
+      for (let j = 0; j < channel.length; j++) {
+        const y = Math.sin(wave.x) * wave.currentAmplitude;
+        channel[j] += y;
+        wave.x += xIncrement;
+        
+        if (wave.x >= 2 * Math.PI) {
+          wave.x -= 2 * Math.PI;
+        }
       }
     }
 

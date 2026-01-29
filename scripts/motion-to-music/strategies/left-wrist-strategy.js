@@ -21,26 +21,28 @@ export class LeftWristStrategy {
 
   map(motionData, previousParams) {
     if (!motionData || !motionData.joints) {
-      // If no data, keep previous but mute amplitude
-      return {
-        frequency: previousParams.frequency,
-        amplitude: 0
-      };
+      return previousParams.map(param => ({
+        ...param,
+        amplitude: 0,
+        phase: 0
+      }));
     }
 
     const leftWrist = motionData.joints.leftWrist;
 
     if (!leftWrist) {
-      return {
-        frequency: previousParams.frequency,
-        amplitude: 0
-      };
+      return previousParams.map(param => ({
+        ...param,
+        amplitude: 0,
+        phase: 0
+      }));
     }
 
     const frequency = this.mapHeightToFrequency(leftWrist.position.y);
     const amplitude = this.mapVelocityToAmplitude(leftWrist.velocity.magnitude);
+    const phase = 0;
 
-    return { frequency, amplitude };
+    return [{ frequency, amplitude, phase }];
   }
 
   mapHeightToFrequency(height) {

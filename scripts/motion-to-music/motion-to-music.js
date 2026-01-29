@@ -4,10 +4,13 @@ export class MotionToMusic {
   constructor(strategy = new LeftWristStrategy()) {
     this.strategy = strategy;
 
-    this.currentParams = {
-      frequency: 440,  // Default: A4
-      amplitude: 0     // Default: silent
-    };
+    this.currentParams = [
+      {
+        frequency: 440,  // Default: A4
+        amplitude: 0,     // Default: silent
+        phase: 0
+      }
+    ];
 
     this.onParametersCallback = null;
   }
@@ -23,7 +26,7 @@ export class MotionToMusic {
 
     const params = this.strategy.map(motionData, this.currentParams);
 
-    if (!params || typeof params.frequency !== 'number' || typeof params.amplitude !== 'number') {
+    if (!Array.isArray(params)) {
       return this.currentParams;
     }
 
@@ -37,7 +40,7 @@ export class MotionToMusic {
   }
 
   getCurrentParameters() {
-    return { ...this.currentParams };
+    return [...this.currentParams];
   }
 
   setStrategy(strategy) {
@@ -46,7 +49,7 @@ export class MotionToMusic {
 
   dispose() {
     this.onParametersCallback = null;
-    this.currentParams = { frequency: 440, amplitude: 0 };
+    this.currentParams = [{ frequency: 440, amplitude: 0, phase: 0 }];
     console.log('Motion-to-music disposed');
   }
 }
