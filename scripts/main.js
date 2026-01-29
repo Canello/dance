@@ -2,6 +2,7 @@ import { VideoInput } from './video-input/video-input.js';
 import { PoseEstimation } from './pose-estimation/pose-estimation.js';
 import { MotionAnalysis } from './motion-analysis/motion-analysis.js';
 import { MotionToMusic } from './motion-to-music/motion-to-music.js';
+import { SoundEngine } from './sound-engine/sound-engine.js';
 
 class Orchestrator {
   constructor() {
@@ -9,12 +10,7 @@ class Orchestrator {
     this.poseEstimation = new PoseEstimation();
     this.motionAnalysis = new MotionAnalysis();
     this.motionToMusic = new MotionToMusic();
-    
-    // Debug access
-    window.videoInput = this.videoInput;
-    window.poseEstimation = this.poseEstimation;
-    window.motionAnalysis = this.motionAnalysis;
-    window.motionToMusic = this.motionToMusic;
+    this.soundEngine = new SoundEngine();
   }
 
   async start() {
@@ -28,10 +24,11 @@ class Orchestrator {
       this.motionToMusic.processMotion(motionData);
     });
     this.motionToMusic.setOnParametersCallback((params) => {
-      // This will be connected to sound engine later
-      console.log('Parameters:', params.frequency.toFixed(1), 'Hz,', params.amplitude.toFixed(2));
+      this.soundEngine.updateParameters(params);
     });
     
+    await this.soundEngine.initialize();
+    await this.soundEngine.start();
     await this.poseEstimation.initialize();
     await this.videoInput.initialize();
     this.videoInput.start();
