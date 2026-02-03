@@ -48,7 +48,14 @@ export class ChordStrategy {
 
     calculateFundamentalFrequency(motionData) {
         const rightWristVelocityY = motionData.joints.rightWrist.velocity.y;
-        if (rightWristVelocityY > 0) {
+        const rightWristVelocityX = motionData.joints.rightWrist.velocity.x;
+        if (rightWristVelocityY > 0 && rightWristVelocityX > 0) {
+            return 440;
+        } else if (rightWristVelocityY > 0 && rightWristVelocityX < 0) {
+            return 660;
+        } else if (rightWristVelocityY < 0 && rightWristVelocityX > 0) {
+            return 660;
+        } else if (rightWristVelocityY < 0 && rightWristVelocityX < 0) {
             return 440;
         } else {
             return 660;
@@ -59,7 +66,7 @@ export class ChordStrategy {
         return this.harmonics.map((harmonic, index) => ({
             frequency: harmonic * fundamentalFrequency,
             amplitude: this.harmonicRelativeAmplitudes[index] * harmonicAmplitudes[index],
-            phase: 0
+            phase: this.phases[index]
         }));
     }
 }
