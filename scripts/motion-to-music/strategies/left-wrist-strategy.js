@@ -14,8 +14,8 @@ export class LeftWristStrategy {
 
     // Typical human arm velocity: 0-5 m/s for fast movements
     this.velocityRange = {
-      min: 0,
-      max: 5.0
+      min: 0.2,
+      max: 0.5
     };
   }
 
@@ -60,6 +60,8 @@ export class LeftWristStrategy {
   }
 
   mapVelocityToAmplitude(velocity) {
+    if (velocity < this.velocityRange.min) return 0;
+    
     const clampedVelocity = Math.max(
       this.velocityRange.min,
       Math.min(this.velocityRange.max, velocity)
@@ -67,7 +69,6 @@ export class LeftWristStrategy {
 
     const amplitude = clampedVelocity / this.velocityRange.max;
 
-    // Square root for smoother perceptual response
-    return Math.sqrt(amplitude);
+    return amplitude;
   }
 }

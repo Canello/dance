@@ -1,13 +1,17 @@
-import { LeftWristStrategy, WristsHarmonicsStrategy } from './strategies/index.js';
+import {
+  ChordStrategy,
+  LeftWristStrategy,
+  WristsHarmonicsStrategy
+} from './strategies/index.js';
 
 export class MotionToMusic {
-  constructor(strategy = new WristsHarmonicsStrategy()) {
+  constructor(strategy = new ChordStrategy()) {
     this.strategy = strategy;
 
     this.currentParams = [
       {
         frequency: 440,  // Default: A4
-        amplitude: 0,     // Default: silent
+        amplitude: 0,    // Default: silent
         phase: 0
       }
     ];

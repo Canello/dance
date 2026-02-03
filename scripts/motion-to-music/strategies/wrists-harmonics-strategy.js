@@ -1,8 +1,8 @@
 export class WristsHarmonicsStrategy {
   constructor() {
     this.frequencyRange = {
-        min: 220,  // A3 (lower bound)
-        max: 880   // A5 (upper bound, two octaves)
+        min: 55,
+        max: 880
     };
         
     // MediaPipe world coordinates: Y is typically negative (below camera)
