@@ -1,4 +1,5 @@
 import {
+  ChordFieldStrategy,
   Chord2Strategy,
   ChordStrategy,
   LeftWristStrategy,
@@ -6,7 +7,7 @@ import {
 } from './strategies/index.js';
 
 export class MotionToMusic {
-  constructor(strategy = new Chord2Strategy()) {
+  constructor(strategy = new ChordFieldStrategy()) {
     this.strategy = strategy;
 
     this.currentParams = [
